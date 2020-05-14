@@ -1,6 +1,7 @@
-package main
+package app
 
 import (
+	"log"
 	"os"
 	"path"
 
@@ -17,14 +18,17 @@ type Configuration struct {
 	Remotes []Remote `toml:"remote"`
 }
 
-func LoadConfiguration() Configuration {
+var Config Configuration
+
+func init() {
 	home, err := os.UserHomeDir()
-	CheckErr(err)
+	if err != nil {
+		log.Fatal(err)
+	}
 	configPath := path.Join(home, ".garcrc")
 
-	var config Configuration
-	_, err = toml.DecodeFile(configPath, &config)
-	CheckErr(err)
-
-	return config
+	_, err = toml.DecodeFile(configPath, &Config)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

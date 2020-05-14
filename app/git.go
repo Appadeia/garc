@@ -1,11 +1,24 @@
-package main
+package app
 
 import (
+	"math/rand"
+	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"gopkg.in/src-d/go-git.v4"
 )
+
+var WorkingRepository *git.Repository
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+	wd, err := os.Getwd()
+	CheckErr(err)
+	WorkingRepository, err = git.PlainOpen(wd)
+	CheckErr(err)
+}
 
 func GetRemoteOriginURL() string {
 	command := exec.Command("git", "remote", "get-url", "origin")
@@ -22,11 +35,9 @@ func GetParentOriginURL() string {
 }
 
 func GrabConfigForRepo() Remote {
-	config := LoadConfiguration()
-
 	url := GetRemoteOriginURL()
 
-	for _, remote := range config.Remotes {
+	for _, remote := range Config.Remotes {
 		if strings.Contains(url, remote.RemoteURL) {
 			return remote
 		}
